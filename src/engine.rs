@@ -27,6 +27,7 @@ pub(crate) fn send(
         for _ in ev_engine.read() {
             let task_pool = AsyncComputeTaskPool::get();
             let e = engine.clone();
+
             let task = task_pool.spawn(async move {
                 let e = uci::Engine::new(e.0.to_str().unwrap()).unwrap();
                 let chess = Chess::from_setup(
