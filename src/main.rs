@@ -101,6 +101,8 @@ fn main() {
                 pgn::pgn,
                 history::back,
                 history::forward,
+                history::first,
+                history::last,
             ),
         )
         .run();

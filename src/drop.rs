@@ -84,7 +84,9 @@ pub(crate) fn drop(
                                 turn: c.turn(),
                             });
 
-                            history.current += 1;
+                            if history.entries.len() > 1 {
+                                history.current += 1;
+                            }
 
                             ev_engine.send(EngineEvent);
                         }

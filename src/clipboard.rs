@@ -7,7 +7,7 @@ pub(crate) fn clipboard(
     mut evr_pgn: EventWriter<PgnEvent>,
     keys: Res<ButtonInput<KeyCode>>,
 ) {
-    if keys.all_pressed([KeyCode::ControlLeft, KeyCode::KeyV]) {
+    if keys.pressed(KeyCode::ControlLeft) && keys.just_released(KeyCode::KeyV) {
         let mut ctx = ClipboardContext::new().unwrap();
 
         let content = ctx.get_contents().unwrap();

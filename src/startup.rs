@@ -2,10 +2,10 @@ use crate::{
     drag::DragEvent,
     drag_end::DragEndEvent,
     engine::EngineTasks,
-    history::History,
+    history::{History, HistoryEntry},
     select::SelectEvent,
     utils::get_texture,
-    {Board, DropEvent, Engine, Game, Piece, Square},
+    Board, DropEvent, Engine, Game, Piece, Square,
 };
 use bevy::{
     prelude::*,
@@ -96,7 +96,7 @@ pub(crate) fn startup(
 
     commands.insert_resource(EngineTasks(HashMap::new()));
     commands.spawn(History {
-        entries: Vec::new(),
+        entries: Vec::new().to_vec(),
         current: 0,
     });
     commands.spawn(game);
