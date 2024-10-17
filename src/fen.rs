@@ -29,19 +29,23 @@ pub(crate) fn fen(
             let mut game = q_games.get_single_mut().expect("Game not found!");
             let mut history = q_history.get_single_mut().expect("History not found!");
 
-            let chess = fen.into_setup();
-            let board = chess.board.clone();
+            let pos = fen.into_setup();
+            let board = pos.board.clone();
             let (by_role, by_color) = board.into_bitboards();
 
+            let ep_square = pos.ep_square;
+
             game.board = Board { by_role, by_color };
-            game.castling_rights = chess.castling_rights;
-            game.turn = chess.turn;
+            game.castling_rights = pos.castling_rights;
+            game.turn = pos.turn;
+            game.ep_square = ep_square;
 
             history.entries.clear();
             history.entries.push(HistoryEntry {
                 board: Board { by_role, by_color },
-                castling_rights: chess.castling_rights,
-                turn: chess.turn,
+                castling_rights: pos.castling_rights,
+                turn: pos.turn,
+                ep_square,
             });
 
             commands.spawn((

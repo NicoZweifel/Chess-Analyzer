@@ -17,6 +17,7 @@ pub(crate) struct HistoryEntry {
     pub(crate) board: Board,
     pub(crate) turn: shakmaty::Color,
     pub(crate) castling_rights: Bitboard,
+    pub(crate) ep_square: Option<shakmaty::Square>,
 }
 
 #[derive(Component, Clone, Debug)]

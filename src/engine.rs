@@ -25,8 +25,8 @@ pub(crate) fn send_to_engines(
 ) {
     let game = q_games.get_single().expect("Game not found!").clone();
 
-    for engine in q_engines.iter() {
-        for _ in ev_engine.read() {
+    for _ in ev_engine.read() {
+        for engine in q_engines.iter() {
             let task_pool = AsyncComputeTaskPool::get();
             let e = engine.clone();
 

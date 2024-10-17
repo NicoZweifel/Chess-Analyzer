@@ -49,13 +49,15 @@ impl Visitor for Positions {
             let board = self.pos.board().clone();
             let (by_role, by_color) = board.into_bitboards();
             let castles = self.pos.castles();
-            let game = HistoryEntry {
+            let ep_square = self.pos.ep_square(shakmaty::EnPassantMode::Legal);
+            let entry = HistoryEntry {
                 board: Board { by_role, by_color },
                 castling_rights: castles.castling_rights(),
                 turn: self.pos.turn(),
+                ep_square,
             };
 
-            self.entries.push(game);
+            self.entries.push(entry);
         }
     }
 
@@ -99,6 +101,7 @@ pub(crate) fn pgn(
             game.board = Board { by_role, by_color };
             game.castling_rights = chess.castles().castling_rights();
             game.turn = chess.turn();
+            game.ep_square = chess.ep_square(shakmaty::EnPassantMode::Legal);
 
             history.entries.clear();
             history.entries = visitor.entries.clone();

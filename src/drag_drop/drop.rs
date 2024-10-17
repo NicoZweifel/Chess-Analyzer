@@ -50,6 +50,7 @@ pub(crate) fn drop(
             shakmaty::Setup {
                 board: shakmaty::Board::from_bitboards(game.board.by_role, game.board.by_color),
                 turn: game.turn,
+                ep_square: game.ep_square,
                 castling_rights: game.castling_rights,
                 ..default()
             },
@@ -57,7 +58,6 @@ pub(crate) fn drop(
         )
         .expect("Chess could not load!");
 
-        println!("move \n {:?} \n {:?} ", from, to);
         if let Ok(from_square) = from {
             if let Ok(to_square) = to {
                 let moves = chess.legal_moves();
@@ -65,23 +65,24 @@ pub(crate) fn drop(
                     .iter()
                     .find(|&x| x.from() == Some(from_square.square) && x.to() == to_square.square);
 
-                println!("move {:?} ", legal_move);
                 if let Some(m) = legal_move {
                     match chess.play(m) {
                         Ok(c) => {
-                            println!("played {:?} ", legal_move);
                             let board = c.board().clone();
                             let (by_role, by_color) = board.into_bitboards();
                             let castles = c.castles();
+                            let ep_square = c.ep_square(shakmaty::EnPassantMode::Legal);
 
                             game.board = Board { by_role, by_color };
                             game.castling_rights = castles.castling_rights();
                             game.turn = c.turn();
+                            game.ep_square = ep_square;
 
                             history.entries.push(HistoryEntry {
                                 board: Board { by_role, by_color },
                                 castling_rights: castles.castling_rights(),
                                 turn: c.turn(),
+                                ep_square,
                             });
 
                             if history.entries.len() > 1 {

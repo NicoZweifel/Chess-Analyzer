@@ -39,6 +39,7 @@ pub(crate) fn select(
             shakmaty::Setup {
                 board: shakmaty::Board::from_bitboards(game.board.by_role, game.board.by_color),
                 turn: game.turn,
+                ep_square: game.ep_square,
                 castling_rights: game.castling_rights,
                 ..default()
             },

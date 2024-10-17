@@ -25,6 +25,7 @@ pub(crate) struct Game {
     pub(crate) board: Board,
     pub(crate) turn: shakmaty::Color,
     pub(crate) castling_rights: Bitboard,
+    pub(crate) ep_square: Option<shakmaty::Square>,
 }
 
 #[derive(Clone, Copy, Debug)]

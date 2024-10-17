@@ -14,7 +14,7 @@ pub(crate) fn forward(
     let mut history = q_history.get_single_mut().expect("History not found!");
     if !keys.pressed(KeyCode::ControlLeft)
         && keys.any_just_released([KeyCode::ArrowRight, KeyCode::Enter])
-        && history.current < history.entries.len()
+        && history.current < history.entries.len() - 1
     {
         history.current += 1;
 

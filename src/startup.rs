@@ -33,6 +33,7 @@ pub(crate) fn startup(
         board: Board { by_role, by_color },
         castling_rights: start.castles().castling_rights(),
         turn: start.turn(),
+        ep_square: start.ep_square(shakmaty::EnPassantMode::Legal),
     };
 
     for (counter, square) in shakmaty::Square::ALL.iter().enumerate() {
