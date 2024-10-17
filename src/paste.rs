@@ -1,0 +1,30 @@
+use std::fs::File;
+use std::io::prelude::*;
+
+use bevy::prelude::*;
+
+use crate::fen::FenEvent;
+use crate::pgn::PgnEvent;
+
+pub(crate) fn paste(
+    mut evr_dnd: EventReader<FileDragAndDrop>,
+    mut evr_fen: EventWriter<FenEvent>,
+    mut evr_pgn: EventWriter<PgnEvent>,
+) {
+    for ev in evr_dnd.read() {
+        if let FileDragAndDrop::DroppedFile { window, path_buf } = ev {
+            println!(
+                "Dropped file with path: {:?}, in window id: {:?}",
+                path_buf, window
+            );
+
+            if let Ok(mut file) = File::open(path_buf) {
+                let mut content = String::new();
+                if file.read_to_string(&mut content).is_ok() {
+                    evr_fen.send(FenEvent::new(content.clone()));
+                    evr_pgn.send(PgnEvent::new(content));
+                }
+            }
+        }
+    }
+}
