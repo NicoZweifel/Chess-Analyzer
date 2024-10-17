@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
-use drag::DragEvent;
-use drag_end::DragEndEvent;
+use drag::{DragEndEvent, DragEvent};
 use drop::DropEvent;
 use engine::EngineEvent;
 use fen::FenEvent;
@@ -13,7 +12,6 @@ use std::path::PathBuf;
 mod clear_indicators;
 mod clipboard;
 mod drag;
-mod drag_end;
 mod drop;
 mod engine;
 mod fen;
@@ -90,10 +88,10 @@ fn main() {
             (
                 update::update,
                 clear_indicators::clear_indicators,
-                drop::drop.before(drag_end::drag_end),
+                drop::drop.before(drag::drag_end),
                 select::select,
                 drag::drag,
-                drag_end::drag_end.after(drop::drop),
+                drag::drag_end.after(drop::drop),
                 engine::send,
                 engine::receive,
                 clipboard::clipboard,

@@ -1,8 +1,7 @@
 use crate::{
-    drag::DragEvent,
-    drag_end::DragEndEvent,
+    drag::{DragEndEvent, DragEvent},
     engine::EngineTasks,
-    history::{History, HistoryEntry},
+    history::History,
     select::SelectEvent,
     utils::get_texture,
     Board, DropEvent, Engine, Game, Piece, Square,
