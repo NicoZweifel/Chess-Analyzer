@@ -1,7 +1,9 @@
+use crate::{
+    history::{History, HistoryEntry},
+    Board, Game,
+};
 use bevy::prelude::*;
 use shakmaty::fen::Fen;
-
-use crate::{Board, Game, History, HistoryEntry};
 
 #[derive(Event)]
 pub(crate) struct FenEvent {

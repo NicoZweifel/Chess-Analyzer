@@ -1,18 +1,20 @@
-use std::fs;
-
-use bevy::prelude::*;
-use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
-use bevy::utils::HashMap;
-use bevy_inspector_egui::egui::debug_text::print;
+use crate::{
+    drag::DragEvent,
+    drag_end::DragEndEvent,
+    engine::EngineTasks,
+    history::History,
+    select::SelectEvent,
+    utils::get_texture,
+    {Board, DropEvent, Engine, Game, Piece, Square},
+};
+use bevy::{
+    prelude::*,
+    sprite::{MaterialMesh2dBundle, Mesh2dHandle},
+    utils::HashMap,
+};
 use bevy_mod_picking::prelude::*;
 use shakmaty::{Chess, Position};
-
-use crate::drag::DragEvent;
-use crate::drag_end::DragEndEvent;
-use crate::engine::EngineTasks;
-use crate::select::SelectEvent;
-use crate::utils::get_texture;
-use crate::{Board, DropEvent, Engine, Game, History, Piece, Square};
+use std::fs;
 
 pub(crate) fn startup(
     mut commands: Commands,

@@ -1,8 +1,6 @@
+use crate::{fen::FenEvent, pgn::PgnEvent};
 use bevy::prelude::*;
 use copypasta::{ClipboardContext, ClipboardProvider};
-
-use crate::fen::FenEvent;
-use crate::pgn::PgnEvent;
 
 pub(crate) fn clipboard(
     mut evr_fen: EventWriter<FenEvent>,

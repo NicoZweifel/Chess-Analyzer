@@ -1,8 +1,10 @@
 use std::str::FromStr;
 
-use bevy::prelude::*;
-use bevy::tasks::futures_lite::future;
-use bevy::tasks::{block_on, AsyncComputeTaskPool, Task};
+use bevy::{
+    prelude::*,
+    tasks::futures_lite::future,
+    tasks::{block_on, AsyncComputeTaskPool, Task},
+};
 
 use bevy::utils::HashMap;
 use shakmaty::{fen::Fen, Chess, FromSetup};

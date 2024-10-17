@@ -1,7 +1,6 @@
+use crate::{utils::get_texture, Game, Piece, Square};
 use bevy::prelude::*;
 use shakmaty::{Chess, FromSetup, Position};
-
-use crate::{utils::get_texture, Game, Piece, Square};
 
 pub(crate) fn update(
     q_games: Query<&mut Game>,

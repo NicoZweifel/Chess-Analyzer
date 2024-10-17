@@ -1,6 +1,5 @@
-use bevy::prelude::*;
-
 use crate::{drop::DropEvent, engine::EngineEvent, select::SelectEvent, EngineMove, Indicator};
+use bevy::prelude::*;
 
 pub(crate) fn clear_indicators(
     q_indicators: Query<(Entity, &Indicator, &Parent)>,

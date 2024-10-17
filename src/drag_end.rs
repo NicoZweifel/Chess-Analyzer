@@ -1,7 +1,6 @@
+use crate::Square;
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
-
-use crate::Square;
 
 #[derive(Event)]
 pub(crate) struct DragEndEvent {

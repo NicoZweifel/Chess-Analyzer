@@ -1,9 +1,11 @@
+use crate::{
+    engine::EngineEvent,
+    history::{History, HistoryEntry},
+    Board, Game, Piece, Square,
+};
 use bevy::prelude::*;
-
 use bevy_mod_picking::prelude::*;
 use shakmaty::{Chess, FromSetup, Position};
-
-use crate::{engine::EngineEvent, Board, Game, History, HistoryEntry, Indicator, Piece, Square};
 
 #[derive(Event)]
 pub(crate) struct DropEvent {

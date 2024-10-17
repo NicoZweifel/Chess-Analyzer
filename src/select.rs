@@ -1,10 +1,8 @@
-use std::collections::HashMap;
-
+use crate::{engine::EngineEvent, Game, Indicator, Square};
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use shakmaty::{Chess, FromSetup, Position};
-
-use crate::{engine::EngineEvent, Game, Indicator, Square};
+use std::collections::HashMap;
 
 #[derive(Event)]
 pub(crate) struct SelectEvent {

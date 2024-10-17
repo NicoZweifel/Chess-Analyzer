@@ -1,12 +1,11 @@
+use crate::{
+    engine::EngineEvent,
+    history::{History, HistoryEntry},
+    Board, Game,
+};
 use bevy::prelude::*;
-use shakmaty::fen::Fen;
-
-use crate::engine::EngineEvent;
-use crate::{Board, Game, History, HistoryEntry};
-
-use shakmaty::{CastlingMode, Chess, Position};
-
 use pgn_reader::{BufferedReader, RawHeader, SanPlus, Skip, Visitor};
+use shakmaty::{fen::Fen, CastlingMode, Chess, Position};
 
 #[derive(Clone, Debug)]
 struct Positions {

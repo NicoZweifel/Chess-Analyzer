@@ -1,10 +1,7 @@
+use crate::{fen::FenEvent, pgn::PgnEvent};
+use bevy::prelude::*;
 use std::fs::File;
 use std::io::prelude::*;
-
-use bevy::prelude::*;
-
-use crate::fen::FenEvent;
-use crate::pgn::PgnEvent;
 
 pub(crate) fn paste(
     mut evr_dnd: EventReader<FileDragAndDrop>,

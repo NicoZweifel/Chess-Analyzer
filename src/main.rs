@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use drag::DragEvent;
@@ -10,8 +8,8 @@ use fen::FenEvent;
 use pgn::PgnEvent;
 use select::SelectEvent;
 use shakmaty::{Bitboard, ByColor, ByRole};
+use std::path::PathBuf;
 
-mod back;
 mod clear_indicators;
 mod clipboard;
 mod drag;
@@ -19,7 +17,7 @@ mod drag_end;
 mod drop;
 mod engine;
 mod fen;
-mod forward;
+mod history;
 mod paste;
 mod pgn;
 mod select;
@@ -55,19 +53,6 @@ struct Game {
 struct Board {
     by_role: ByRole<Bitboard>,
     by_color: ByColor<Bitboard>,
-}
-
-#[derive(Clone, Debug)]
-struct HistoryEntry {
-    board: Board,
-    turn: shakmaty::Color,
-    castling_rights: Bitboard,
-}
-
-#[derive(Component, Clone, Debug)]
-struct History {
-    entries: Vec<HistoryEntry>,
-    current: usize,
 }
 
 impl Square {
@@ -114,9 +99,8 @@ fn main() {
                 clipboard::clipboard,
                 fen::fen,
                 pgn::pgn,
-                paste::paste,
-                back::back,
-                forward::forward,
+                history::back,
+                history::forward,
             ),
         )
         .run();
