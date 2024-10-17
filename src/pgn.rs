@@ -1,9 +1,9 @@
 use crate::{
     engine::EngineEvent,
     history::{History, HistoryEntry},
-    Board, Game,
+    Board, BoardStartSound, Game,
 };
-use bevy::prelude::*;
+use bevy::{audio::Volume, prelude::*};
 use pgn_reader::{BufferedReader, RawHeader, SanPlus, Skip, Visitor};
 use shakmaty::{fen::Fen, CastlingMode, Chess, Position};
 
@@ -60,7 +60,7 @@ impl Visitor for Positions {
     }
 
     fn end_game(&mut self) -> Self::Result {
-        ::std::mem::replace(&mut self.pos, Chess::default())
+        std::mem::take(&mut self.pos)
     }
 }
 
@@ -76,10 +76,12 @@ impl PgnEvent {
 }
 
 pub(crate) fn pgn(
+    mut commands: Commands,
     mut q_games: Query<&mut Game>,
     mut q_history: Query<&mut History>,
     mut evw_engine: EventWriter<EngineEvent>,
     mut evr_pgn: EventReader<PgnEvent>,
+    asset_server: Res<AssetServer>,
 ) {
     for ev in evr_pgn.read() {
         let content = ev.content.clone();
@@ -100,7 +102,20 @@ pub(crate) fn pgn(
 
             history.entries.clear();
             history.entries = visitor.entries.clone();
-            history.current = visitor.entries.len() - 1;
+            let len = visitor.entries.len();
+            history.current = if len > 0 { len - 1 } else { 0 };
+
+            commands.spawn((
+                AudioBundle {
+                    source: asset_server.load("board-start.mp3"),
+                    settings: PlaybackSettings {
+                        volume: Volume::new(0.5),
+                        mode: bevy::audio::PlaybackMode::Despawn,
+                        ..default()
+                    },
+                },
+                BoardStartSound,
+            ));
 
             evw_engine.send(EngineEvent);
         }

@@ -1,7 +1,7 @@
 use crate::{
     engine::EngineEvent,
     history::{History, HistoryEntry},
-    Board, Game, Piece, Square,
+    Board, CaptureSound, Game, Piece, PlacementSound, Square,
 };
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;

@@ -17,7 +17,7 @@ pub(crate) struct EngineEvent;
 #[derive(Resource)]
 pub(crate) struct EngineTasks(pub(crate) HashMap<String, Task<String>>);
 
-pub(crate) fn send(
+pub(crate) fn send_to_engines(
     mut rm_tasks: ResMut<EngineTasks>,
     q_engines: Query<&Engine>,
     q_games: Query<&mut Game>,
@@ -65,7 +65,7 @@ pub(crate) fn send(
     }
 }
 
-pub(crate) fn receive(
+pub(crate) fn check_engines(
     mut my_tasks: ResMut<EngineTasks>,
     mut commands: Commands,
     q_games: Query<&Game>,

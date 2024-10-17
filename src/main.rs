@@ -1,63 +1,32 @@
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
-use drag::{DragEndEvent, DragEvent};
-use drop::DropEvent;
-use engine::EngineEvent;
-use fen::FenEvent;
-use pgn::PgnEvent;
-use select::SelectEvent;
-use shakmaty::{Bitboard, ByColor, ByRole};
-use std::path::PathBuf;
 
 mod clear_indicators;
-mod clipboard;
-mod drag;
-mod drop;
+mod core;
+mod drag_drop;
 mod engine;
 mod fen;
+mod file_drop;
 mod history;
-mod paste;
+mod paste_clipboard;
 mod pgn;
 mod select;
 mod startup;
 mod update;
 mod utils;
 
-#[derive(Component, Clone, Copy, Debug)]
-struct Piece(shakmaty::Piece);
-
-#[derive(Component, Clone, Copy, Debug)]
-struct Indicator;
-
-#[derive(Component, Clone, Debug)]
-struct Engine(PathBuf);
-
-#[derive(Component, Clone, Copy, Debug)]
-struct EngineMove;
-
-#[derive(Component, Clone, Debug, Copy)]
-struct Square {
-    square: shakmaty::Square,
-}
-
-#[derive(Component, Clone, Debug)]
-struct Game {
-    board: Board,
-    turn: shakmaty::Color,
-    castling_rights: Bitboard,
-}
-
-#[derive(Clone, Copy, Debug)]
-struct Board {
-    by_role: ByRole<Bitboard>,
-    by_color: ByColor<Bitboard>,
-}
-
-impl Square {
-    pub fn new(square: shakmaty::Square) -> Self {
-        Self { square }
-    }
-}
+pub(crate) use clear_indicators::*;
+pub(crate) use core::*;
+pub(crate) use drag_drop::*;
+pub(crate) use engine::*;
+pub(crate) use fen::*;
+pub(crate) use file_drop::*;
+pub(crate) use history::*;
+pub(crate) use paste_clipboard::*;
+pub(crate) use pgn::*;
+pub(crate) use select::*;
+pub(crate) use startup::*;
+pub(crate) use update::*;
 
 fn main() {
     App::new()
@@ -82,25 +51,26 @@ fn main() {
         .add_event::<EngineEvent>()
         .add_event::<FenEvent>()
         .add_event::<PgnEvent>()
-        .add_systems(Startup, startup::startup)
+        .add_systems(Startup, startup)
         .add_systems(
             Update,
             (
-                update::update,
-                clear_indicators::clear_indicators,
-                drop::drop.before(drag::drag_end),
-                select::select,
-                drag::drag,
-                drag::drag_end.after(drop::drop),
-                engine::send,
-                engine::receive,
-                clipboard::clipboard,
-                fen::fen,
-                pgn::pgn,
-                history::back,
-                history::forward,
-                history::first,
-                history::last,
+                update,
+                clear_indicators,
+                drop.before(drag_end),
+                select,
+                drag,
+                drag_end.after(drop),
+                send_to_engines,
+                check_engines,
+                clipboard_paste,
+                fen,
+                pgn,
+                back,
+                forward,
+                first,
+                last,
+                file_drop,
             ),
         )
         .run();

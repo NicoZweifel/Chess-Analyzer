@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use std::fs::File;
 use std::io::prelude::*;
 
-pub(crate) fn paste(
+pub(crate) fn file_drop(
     mut evr_dnd: EventReader<FileDragAndDrop>,
     mut evr_fen: EventWriter<FenEvent>,
     mut evr_pgn: EventWriter<PgnEvent>,

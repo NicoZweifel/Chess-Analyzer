@@ -1,12 +1,13 @@
 use crate::{
-    drag::{DragEndEvent, DragEvent},
+    drag_drop::{DragEndEvent, DragEvent},
     engine::EngineTasks,
     history::History,
     select::SelectEvent,
     utils::get_texture,
-    Board, DropEvent, Engine, Game, Piece, Square,
+    Board, BoardStartSound, CaptureSound, DropEvent, Engine, Game, Piece, PlacementSound, Square,
 };
 use bevy::{
+    audio::Volume,
     prelude::*,
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
     utils::HashMap,
@@ -94,9 +95,23 @@ pub(crate) fn startup(
     }
 
     commands.insert_resource(EngineTasks(HashMap::new()));
+
     commands.spawn(History {
         entries: Vec::new().to_vec(),
         current: 0,
     });
+
     commands.spawn(game);
+
+    commands.spawn((
+        AudioBundle {
+            source: asset_server.load("board-start.mp3"),
+            settings: PlaybackSettings {
+                volume: Volume::new(0.5),
+                mode: bevy::audio::PlaybackMode::Despawn,
+                ..default()
+            },
+        },
+        BoardStartSound,
+    ));
 }

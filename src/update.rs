@@ -1,5 +1,5 @@
-use crate::{utils::get_texture, Game, Piece, Square};
-use bevy::prelude::*;
+use crate::{utils::get_texture, CaptureSound, Game, Piece, PlacementSound, Square};
+use bevy::{audio::Volume, prelude::*};
 use shakmaty::{Chess, FromSetup, Position};
 
 pub(crate) fn update(
@@ -8,6 +8,8 @@ pub(crate) fn update(
     q_squares: Query<(Entity, &Square, Option<&Children>)>,
     q_pieces: Query<(Entity, &Piece, &Parent)>,
     asset_server: Res<AssetServer>,
+    q_placement: Query<&AudioSink, With<PlacementSound>>,
+    q_capture: Query<&AudioSink, With<CaptureSound>>,
 ) {
     let game = q_games.get_single().expect("Game not found!");
     let chess = Chess::from_setup(
@@ -53,6 +55,18 @@ pub(crate) fn update(
                         .id();
 
                     commands.entity(square.0).push_children(&[child]);
+
+                    commands.spawn((
+                        AudioBundle {
+                            source: asset_server.load("piece-capture.mp3"),
+                            settings: PlaybackSettings {
+                                volume: Volume::new(0.5),
+                                mode: bevy::audio::PlaybackMode::Despawn,
+                                ..default()
+                            },
+                        },
+                        CaptureSound,
+                    ));
                 }
             } else {
                 let child = commands
@@ -66,6 +80,18 @@ pub(crate) fn update(
                     .id();
 
                 commands.entity(square.0).push_children(&[child]);
+
+                commands.spawn((
+                    AudioBundle {
+                        source: asset_server.load("piece-placement.mp3"),
+                        settings: PlaybackSettings {
+                            volume: Volume::new(0.5),
+                            mode: bevy::audio::PlaybackMode::Despawn,
+                            ..default()
+                        },
+                    },
+                    PlacementSound,
+                ));
             }
         } else if let Some(piece_component) = piece_component {
             commands

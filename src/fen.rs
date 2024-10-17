@@ -1,8 +1,8 @@
 use crate::{
     history::{History, HistoryEntry},
-    Board, Game,
+    Board, BoardStartSound, EngineEvent, Game,
 };
-use bevy::prelude::*;
+use bevy::{audio::Volume, prelude::*};
 use shakmaty::fen::Fen;
 
 #[derive(Event)]
@@ -17,9 +17,12 @@ impl FenEvent {
 }
 
 pub(crate) fn fen(
+    mut commands: Commands,
     mut q_games: Query<&mut Game>,
     mut q_history: Query<&mut History>,
     mut evr_fen: EventReader<FenEvent>,
+    mut evw_engine: EventWriter<EngineEvent>,
+    asset_server: Res<AssetServer>,
 ) {
     for ev in evr_fen.read() {
         if let Ok(fen) = ev.content.parse::<Fen>() {
@@ -40,6 +43,20 @@ pub(crate) fn fen(
                 castling_rights: chess.castling_rights,
                 turn: chess.turn,
             });
+
+            commands.spawn((
+                AudioBundle {
+                    source: asset_server.load("board-start.mp3"),
+                    settings: PlaybackSettings {
+                        volume: Volume::new(0.5),
+                        mode: bevy::audio::PlaybackMode::Despawn,
+                        ..default()
+                    },
+                },
+                BoardStartSound,
+            ));
+
+            evw_engine.send(EngineEvent);
         }
     }
 }
