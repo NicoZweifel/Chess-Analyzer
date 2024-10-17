@@ -49,14 +49,9 @@ impl Visitor for Positions {
 
             let board = self.pos.board().clone();
             let (by_role, by_color) = board.into_bitboards();
-            let occupied = self.pos.board().occupied();
             let castles = self.pos.castles();
             let game = HistoryEntry {
-                board: Board {
-                    by_role,
-                    by_color,
-                    occupied,
-                },
+                board: Board { by_role, by_color },
                 castling_rights: castles.castling_rights(),
                 turn: self.pos.turn(),
             };
@@ -90,23 +85,17 @@ pub(crate) fn pgn(
     for ev in evr_pgn.read() {
         let content = ev.content.clone();
 
-        println!("pgn: {}", content);
-
         let mut reader = BufferedReader::new_cursor(&content[..]);
-
         let mut visitor = Positions::new();
 
         if let Ok(Some(chess)) = reader.read_game(&mut visitor) {
             let mut game = q_games.get_single_mut().expect("Game not found!");
             let mut history = q_history.get_single_mut().expect("History not found!");
+
             let board = chess.board().clone();
             let (by_role, by_color) = board.into_bitboards();
-            let occupied = chess.board().occupied();
-            game.board = Board {
-                by_role,
-                by_color,
-                occupied,
-            };
+
+            game.board = Board { by_role, by_color };
             game.castling_rights = chess.castles().castling_rights();
             game.turn = chess.turn();
 

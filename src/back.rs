@@ -31,14 +31,9 @@ pub(crate) fn back(
         history.current -= 1;
         let board = pos.board().clone();
         let (by_role, by_color) = board.into_bitboards();
-        let occupied = pos.board().occupied();
         let castles = pos.castles();
 
-        game.board = Board {
-            by_role,
-            by_color,
-            occupied,
-        };
+        game.board = Board { by_role, by_color };
         game.castling_rights = castles.castling_rights();
         game.turn = pos.turn();
 

@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use drag::DragEvent;
@@ -31,6 +33,9 @@ struct Piece(shakmaty::Piece);
 #[derive(Component, Clone, Copy, Debug)]
 struct Indicator;
 
+#[derive(Component, Clone, Debug)]
+struct Engine(PathBuf);
+
 #[derive(Component, Clone, Copy, Debug)]
 struct EngineMove;
 
@@ -50,7 +55,6 @@ struct Game {
 struct Board {
     by_role: ByRole<Bitboard>,
     by_color: ByColor<Bitboard>,
-    occupied: Bitboard,
 }
 
 #[derive(Clone, Debug)]

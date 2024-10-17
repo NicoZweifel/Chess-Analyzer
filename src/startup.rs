@@ -1,6 +1,9 @@
+use std::fs;
+
 use bevy::prelude::*;
 use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
 use bevy::utils::HashMap;
+use bevy_inspector_egui::egui::debug_text::print;
 use bevy_mod_picking::prelude::*;
 use shakmaty::{Chess, Position};
 
@@ -9,7 +12,7 @@ use crate::drag_end::DragEndEvent;
 use crate::engine::EngineTasks;
 use crate::select::SelectEvent;
 use crate::utils::get_texture;
-use crate::{Board, DropEvent, Game, History, Piece, Square};
+use crate::{Board, DropEvent, Engine, Game, History, Piece, Square};
 
 pub(crate) fn startup(
     mut commands: Commands,
@@ -24,13 +27,8 @@ pub(crate) fn startup(
     let start = Chess::default();
     let board = start.board().clone();
     let (by_role, by_color) = board.into_bitboards();
-    let occupied = start.board().occupied();
     let game = Game {
-        board: Board {
-            by_role,
-            by_color,
-            occupied,
-        },
+        board: Board { by_role, by_color },
         castling_rights: start.castles().castling_rights(),
         turn: start.turn(),
     };
@@ -84,6 +82,14 @@ pub(crate) fn startup(
                     ));
                 }
             });
+    }
+
+    let entries = fs::read_dir("./engines").unwrap();
+
+    for entry in entries.flatten() {
+        if std::fs::File::open(entry.path()).is_ok() && !entry.path().ends_with(".gitignore") {
+            commands.spawn(Engine(entry.path()));
+        }
     }
 
     commands.insert_resource(EngineTasks(HashMap::new()));

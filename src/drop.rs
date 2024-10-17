@@ -1,4 +1,4 @@
-use bevy::{prelude::*, sprite::Mesh2dHandle};
+use bevy::prelude::*;
 
 use bevy_mod_picking::prelude::*;
 use shakmaty::{Chess, FromSetup, Position};
@@ -70,23 +70,14 @@ pub(crate) fn drop(
                             println!("played {:?} ", legal_move);
                             let board = c.board().clone();
                             let (by_role, by_color) = board.into_bitboards();
-                            let occupied = c.board().occupied();
                             let castles = c.castles();
 
-                            game.board = Board {
-                                by_role,
-                                by_color,
-                                occupied,
-                            };
+                            game.board = Board { by_role, by_color };
                             game.castling_rights = castles.castling_rights();
                             game.turn = c.turn();
 
                             history.entries.push(HistoryEntry {
-                                board: Board {
-                                    by_role,
-                                    by_color,
-                                    occupied,
-                                },
+                                board: Board { by_role, by_color },
                                 castling_rights: castles.castling_rights(),
                                 turn: c.turn(),
                             });

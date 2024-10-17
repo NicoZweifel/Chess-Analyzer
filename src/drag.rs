@@ -1,27 +1,22 @@
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 
-use crate::{Piece, Square};
+use crate::Square;
 
 #[derive(Event)]
 pub(crate) struct DragEvent {
     listener: Entity,
-    distance: Vec2,
     delta: Vec2,
 }
 impl DragEvent {
-    pub fn new(listener: Entity, delta: Vec2, distance: Vec2) -> Self {
-        Self {
-            listener,
-            delta,
-            distance,
-        }
+    pub fn new(listener: Entity, delta: Vec2) -> Self {
+        Self { listener, delta }
     }
 }
 
 impl From<ListenerInput<Pointer<Drag>>> for DragEvent {
     fn from(event: ListenerInput<Pointer<Drag>>) -> Self {
-        DragEvent::new(event.listener(), event.delta, event.distance)
+        DragEvent::new(event.listener(), event.delta)
     }
 }
 

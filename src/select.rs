@@ -31,7 +31,7 @@ pub(crate) fn select(
     q_squares: Query<(Entity, &Square)>,
     asset_server: Res<AssetServer>,
 ) {
-    let game = q_games.iter().next().expect("Game not found!");
+    let game = q_games.get_single().expect("Game not found!");
 
     for event in ev_select.read() {
         ev_engine.send(EngineEvent);

@@ -6,9 +6,8 @@ use bevy::tasks::{block_on, AsyncComputeTaskPool, Task};
 
 use bevy::utils::HashMap;
 use shakmaty::{fen::Fen, Chess, FromSetup};
-use uci::Engine;
 
-use crate::{EngineMove, Game, Square};
+use crate::{Engine, EngineMove, Game, Square};
 
 #[derive(Event)]
 pub(crate) struct EngineEvent;
@@ -17,44 +16,49 @@ pub(crate) struct EngineEvent;
 pub(crate) struct EngineTasks(pub(crate) HashMap<String, Task<String>>);
 
 pub(crate) fn send(
-    mut my_tasks: ResMut<EngineTasks>,
+    mut rm_tasks: ResMut<EngineTasks>,
+    q_engines: Query<&Engine>,
     q_games: Query<&mut Game>,
     mut ev_engine: EventReader<EngineEvent>,
 ) {
     let game = q_games.get_single().expect("Game not found!").clone();
 
-    for _ in ev_engine.read() {
-        let task_pool = AsyncComputeTaskPool::get();
-        let task = task_pool.spawn(async move {
-            let engine = Engine::new("./engines/stockfish-windows-x86-64-avx2.exe").unwrap();
+    for engine in q_engines.iter() {
+        for _ in ev_engine.read() {
+            let task_pool = AsyncComputeTaskPool::get();
+            let e = engine.clone();
+            let task = task_pool.spawn(async move {
+                let e = uci::Engine::new(e.0.to_str().unwrap()).unwrap();
+                let chess = Chess::from_setup(
+                    shakmaty::Setup {
+                        board: shakmaty::Board::from_bitboards(
+                            game.board.by_role,
+                            game.board.by_color,
+                        ),
+                        turn: game.turn,
+                        castling_rights: game.castling_rights,
+                        ..default()
+                    },
+                    shakmaty::CastlingMode::Standard,
+                )
+                .expect("Chess could not load!");
 
-            let chess = Chess::from_setup(
-                shakmaty::Setup {
-                    board: shakmaty::Board::from_bitboards(game.board.by_role, game.board.by_color),
-                    turn: game.turn,
-                    castling_rights: game.castling_rights,
-                    ..default()
-                },
-                shakmaty::CastlingMode::Standard,
-            )
-            .expect("Chess could not load!");
-
-            if engine
-                .set_position(
+                if e.set_position(
                     Fen::from_position(chess, shakmaty::EnPassantMode::Always)
                         .to_string()
                         .as_str(),
                 )
                 .is_ok()
-            {
-                if let Ok(best_move) = engine.bestmove() {
-                    return best_move;
+                {
+                    if let Ok(best_move) = e.bestmove() {
+                        return best_move;
+                    }
                 }
-            }
-            "".to_string()
-        });
+                "".to_string()
+            });
 
-        my_tasks.0.insert("stockfish".to_string(), task);
+            rm_tasks.0.insert("stockfish".to_string(), task);
+        }
     }
 }
 
