@@ -94,7 +94,6 @@ pub(crate) fn pgn(
         if let Ok(Some(chess)) = reader.read_game(&mut visitor) {
             let mut game = q_games.get_single_mut().expect("Game not found!");
             let mut history = q_history.get_single_mut().expect("History not found!");
-
             let board = chess.board().clone();
             let (by_role, by_color) = board.into_bitboards();
 
@@ -105,7 +104,9 @@ pub(crate) fn pgn(
 
             history.entries.clear();
             history.entries = visitor.entries.clone();
+
             let len = visitor.entries.len();
+
             history.current = if len > 0 { len - 1 } else { 0 };
 
             commands.spawn((

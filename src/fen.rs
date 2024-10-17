@@ -32,7 +32,6 @@ pub(crate) fn fen(
             let pos = fen.into_setup();
             let board = pos.board.clone();
             let (by_role, by_color) = board.into_bitboards();
-
             let ep_square = pos.ep_square;
 
             game.board = Board { by_role, by_color };
