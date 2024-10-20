@@ -1,19 +1,8 @@
-use std::path::PathBuf;
-
 use bevy::prelude::*;
-use shakmaty::{Bitboard, ByColor, ByRole};
+use shakmaty::{Bitboard, ByColor, ByRole, CastlingMode, Chess, FromSetup, Position};
 
 #[derive(Component, Clone, Copy, Debug)]
 pub(crate) struct Piece(pub(crate) shakmaty::Piece);
-
-#[derive(Component, Clone, Copy, Debug)]
-pub(crate) struct Indicator;
-
-#[derive(Component, Clone, Debug)]
-pub(crate) struct Engine(pub(crate) PathBuf);
-
-#[derive(Component, Clone, Copy, Debug)]
-pub(crate) struct EngineMove;
 
 #[derive(Component, Clone, Debug, Copy)]
 pub(crate) struct Square {
@@ -40,11 +29,33 @@ impl Square {
     }
 }
 
-#[derive(Component)]
-pub(crate) struct BoardStartSound;
+impl Game {
+    pub fn default() -> Self {
+        let start = Chess::default();
+        let board = start.board().clone();
+        let (by_role, by_color) = board.into_bitboards();
+        Self {
+            board: Board { by_role, by_color },
+            castling_rights: start.castles().castling_rights(),
+            turn: start.turn(),
+            ep_square: start.ep_square(shakmaty::EnPassantMode::Legal),
+        }
+    }
 
-#[derive(Component)]
-pub(crate) struct CaptureSound;
+    pub fn setup(&mut self, setup: shakmaty::Setup) {
+        self.setup_pos(
+            Chess::from_setup(setup, CastlingMode::Standard).expect("Chess could not load!"),
+        );
+    }
 
-#[derive(Component)]
-pub(crate) struct PlacementSound;
+    pub fn setup_pos(&mut self, pos: Chess) {
+        let board = pos.board().clone();
+        let (by_role, by_color) = board.into_bitboards();
+        let castles = pos.castles();
+
+        self.board = Board { by_role, by_color };
+        self.castling_rights = castles.castling_rights();
+        self.turn = pos.turn();
+        self.ep_square = pos.ep_square(shakmaty::EnPassantMode::Legal);
+    }
+}

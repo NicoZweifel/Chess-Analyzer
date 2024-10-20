@@ -1,47 +1,35 @@
-use crate::{engine::EngineEvent, Board, Game};
+use crate::engine::EngineEvent;
 use bevy::prelude::*;
-use shakmaty::{Chess, FromSetup, Position};
 
-use super::History;
+use super::{History, HistoryEntry, SetupFromEntry};
 
-pub(crate) fn first(
+pub(crate) fn first<T: Component + First, G: Component + SetupFromEntry>(
     keys: Res<ButtonInput<KeyCode>>,
-    mut q_games: Query<&mut Game>,
-    mut q_history: Query<&mut History>,
+    mut q_games: Query<&mut G>,
+    mut q_first: Query<&mut T>,
     mut ev_engine: EventWriter<EngineEvent>,
 ) {
-    let mut game = q_games.get_single_mut().expect("Game not found!");
-    let mut history = q_history.get_single_mut().expect("History not found!");
-    if keys.pressed(KeyCode::ControlLeft)
-        && keys.just_released(KeyCode::ArrowLeft)
-        && !history.entries.is_empty()
-    {
-        let previous = history.entries[0].clone();
+    let mut game = q_games.single_mut();
+    let mut history = q_first.single_mut();
 
-        let pos = Chess::from_setup(
-            shakmaty::Setup {
-                board: shakmaty::Board::from_bitboards(
-                    previous.board.by_role,
-                    previous.board.by_color,
-                ),
-                turn: previous.turn,
-                castling_rights: previous.castling_rights,
-                ..default()
-            },
-            shakmaty::CastlingMode::Standard,
-        )
-        .expect("Chess could not load!");
+    if keys.pressed(KeyCode::ControlLeft) && keys.just_released(KeyCode::ArrowLeft) {
+        if let Some(first) = history.first() {
+            game.setup_history_entry(first);
+            ev_engine.send(EngineEvent);
+        }
+    }
+}
 
-        history.current = 0;
+pub trait First {
+    fn first(&mut self) -> Option<HistoryEntry>;
+}
 
-        let board = pos.board().clone();
-        let (by_role, by_color) = board.into_bitboards();
-        let castles = pos.castles();
-
-        game.board = Board { by_role, by_color };
-        game.castling_rights = castles.castling_rights();
-        game.turn = pos.turn();
-
-        ev_engine.send(EngineEvent);
+impl First for History {
+    fn first(&mut self) -> Option<HistoryEntry> {
+        if !self.entries.is_empty() {
+            self.current = 0;
+            return Some(self.entries[self.current].clone());
+        }
+        None
     }
 }

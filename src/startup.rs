@@ -1,10 +1,6 @@
 use crate::{
-    drag_drop::{DragEndEvent, DragEvent},
-    engine::EngineTasks,
-    history::History,
-    select::SelectEvent,
-    utils::get_texture,
-    Board, BoardStartSound, CaptureSound, DropEvent, Engine, Game, Piece, PlacementSound, Square,
+    engine::EngineTasks, history::History, utils::get_texture, BoardStartSound, DragEndEvent,
+    DragEvent, DropEvent, Engine, Game, Piece, SelectEvent, Square,
 };
 use bevy::{
     audio::Volume,
@@ -27,14 +23,7 @@ pub(crate) fn startup(
     let black = materials.add(Color::BLACK);
 
     let start = Chess::default();
-    let board = start.board().clone();
-    let (by_role, by_color) = board.into_bitboards();
-    let game = Game {
-        board: Board { by_role, by_color },
-        castling_rights: start.castles().castling_rights(),
-        turn: start.turn(),
-        ep_square: start.ep_square(shakmaty::EnPassantMode::Legal),
-    };
+    let game = Game::default();
 
     for (counter, square) in shakmaty::Square::ALL.iter().enumerate() {
         let mesh = Mesh2dHandle(meshes.add(Rectangle::new(100.0, 100.0)));

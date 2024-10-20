@@ -1,16 +1,22 @@
-use crate::Board;
+use std::marker::PhantomData;
+
+use crate::{Board, Game};
 use bevy::prelude::*;
 use shakmaty::Bitboard;
 
 mod back;
 mod first;
-mod forward;
 mod last;
+mod next;
+mod push_entry_from_pos;
+mod setup_from_entry;
 
-pub(crate) use back::back;
-pub(crate) use first::first;
-pub(crate) use forward::forward;
-pub(crate) use last::last;
+pub(crate) use back::*;
+pub(crate) use first::*;
+pub(crate) use last::*;
+pub(crate) use next::*;
+pub(crate) use push_entry_from_pos::*;
+pub(crate) use setup_from_entry::*;
 
 #[derive(Clone, Debug)]
 pub(crate) struct HistoryEntry {
@@ -24,4 +30,46 @@ pub(crate) struct HistoryEntry {
 pub(crate) struct History {
     pub(crate) entries: Vec<HistoryEntry>,
     pub(crate) current: usize,
+}
+
+impl History {
+    pub(crate) fn setup(&mut self, setup: shakmaty::Setup) {
+        let board = setup.board.clone();
+        let (by_role, by_color) = board.into_bitboards();
+        let ep_square = setup.ep_square;
+
+        self.entries.clear();
+        self.entries.push(HistoryEntry {
+            board: Board { by_role, by_color },
+            castling_rights: setup.castling_rights,
+            turn: setup.turn,
+            ep_square,
+        });
+    }
+}
+
+pub struct HistoryPlugin<T: Component + last::Last, G: Component + SetupFromEntry> {
+    phantom: PhantomData<(T, G)>,
+}
+
+impl<T: Component + last::Last, G: Component + SetupFromEntry> HistoryPlugin<T, G> {
+    pub fn default() -> Self {
+        Self {
+            phantom: PhantomData,
+        }
+    }
+}
+
+impl<T: Component + last::Last, G: Component + SetupFromEntry> Plugin for HistoryPlugin<T, G> {
+    fn build(&self, app: &mut App) {
+        app.add_systems(
+            Update,
+            (
+                back::<History, Game>,
+                next::<History, Game>,
+                first::<History, Game>,
+                last::<History, Game>,
+            ),
+        );
+    }
 }

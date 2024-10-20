@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{path::PathBuf, str::FromStr};
 
 use bevy::{
     prelude::*,
@@ -9,7 +9,13 @@ use bevy::{
 use bevy::utils::HashMap;
 use shakmaty::{fen::Fen, Chess, FromSetup};
 
-use crate::{Engine, EngineMove, Game, Square};
+use crate::{Game, Square};
+
+#[derive(Component, Clone, Debug)]
+pub(crate) struct Engine(pub(crate) PathBuf);
+
+#[derive(Component, Clone, Copy, Debug)]
+pub(crate) struct EngineIndicator;
 
 #[derive(Event)]
 pub(crate) struct EngineEvent;
@@ -102,6 +108,7 @@ pub(crate) fn check_engines(
                         (square, entity)
                     })
                     .collect();
+
                 if let Ok(m) = m {
                     let to_square = square_entities.get(&m.to()).unwrap();
                     let from_square = square_entities.get(&m.from().unwrap()).unwrap();
@@ -110,7 +117,7 @@ pub(crate) fn check_engines(
 
                     let child_to = commands
                         .spawn((
-                            EngineMove,
+                            EngineIndicator,
                             SpriteBundle {
                                 texture: texture.clone(),
                                 transform: Transform::from_xyz(0.0, 0.0, 0.3),

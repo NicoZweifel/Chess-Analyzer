@@ -1,8 +1,11 @@
-use crate::{engine::EngineEvent, Game, Indicator, Square};
+use crate::{engine::EngineEvent, Game, Square};
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use shakmaty::{Chess, FromSetup, Position};
 use std::collections::HashMap;
+
+#[derive(Component, Clone, Copy, Debug)]
+pub(crate) struct SelectIndicator;
 
 #[derive(Event)]
 pub(crate) struct SelectEvent {
@@ -67,7 +70,7 @@ pub(crate) fn select(
 
                 let child = commands
                     .spawn((
-                        Indicator,
+                        SelectIndicator,
                         SpriteBundle {
                             texture,
                             transform: Transform::from_xyz(0.0, 0.0, 0.3),

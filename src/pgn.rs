@@ -8,8 +8,8 @@ use pgn_reader::{BufferedReader, RawHeader, SanPlus, Skip, Visitor};
 use shakmaty::{fen::Fen, CastlingMode, Chess, Position};
 
 #[derive(Clone, Debug)]
-struct Positions {
-    entries: Vec<HistoryEntry>,
+pub(crate) struct Positions {
+    pub(crate) entries: Vec<HistoryEntry>,
     pos: Chess,
 }
 
@@ -77,10 +77,10 @@ impl PgnEvent {
     }
 }
 
-pub(crate) fn pgn(
+pub(crate) fn pgn<T: Component + SetupFromPositions>(
     mut commands: Commands,
     mut q_games: Query<&mut Game>,
-    mut q_history: Query<&mut History>,
+    mut q_history: Query<&mut T>,
     mut evw_engine: EventWriter<EngineEvent>,
     mut evr_pgn: EventReader<PgnEvent>,
     asset_server: Res<AssetServer>,
@@ -94,20 +94,10 @@ pub(crate) fn pgn(
         if let Ok(Some(chess)) = reader.read_game(&mut visitor) {
             let mut game = q_games.get_single_mut().expect("Game not found!");
             let mut history = q_history.get_single_mut().expect("History not found!");
-            let board = chess.board().clone();
-            let (by_role, by_color) = board.into_bitboards();
 
-            game.board = Board { by_role, by_color };
-            game.castling_rights = chess.castles().castling_rights();
-            game.turn = chess.turn();
-            game.ep_square = chess.ep_square(shakmaty::EnPassantMode::Legal);
+            game.setup_pos(chess);
 
-            history.entries.clear();
-            history.entries = visitor.entries.clone();
-
-            let len = visitor.entries.len();
-
-            history.current = if len > 0 { len - 1 } else { 0 };
+            history.setup_from_positions(visitor);
 
             commands.spawn((
                 AudioBundle {
@@ -123,5 +113,20 @@ pub(crate) fn pgn(
 
             evw_engine.send(EngineEvent);
         }
+    }
+}
+
+pub trait SetupFromPositions {
+    fn setup_from_positions(&mut self, positions: Positions);
+}
+
+impl SetupFromPositions for History {
+    fn setup_from_positions(&mut self, positions: Positions) {
+        self.entries.clear();
+        self.entries = positions.entries.clone();
+
+        let len = positions.entries.len();
+
+        self.current = if len > 0 { len - 1 } else { 0 };
     }
 }

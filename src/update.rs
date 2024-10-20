@@ -8,10 +8,8 @@ pub(crate) fn update(
     q_squares: Query<(Entity, &Square, Option<&Children>)>,
     q_pieces: Query<(Entity, &Piece, &Parent)>,
     asset_server: Res<AssetServer>,
-    q_placement: Query<&AudioSink, With<PlacementSound>>,
-    q_capture: Query<&AudioSink, With<CaptureSound>>,
 ) {
-    let game = q_games.get_single().expect("Game not found!");
+    let game = q_games.single();
     let chess = Chess::from_setup(
         shakmaty::Setup {
             board: shakmaty::Board::from_bitboards(game.board.by_role, game.board.by_color),

@@ -1,47 +1,37 @@
-use crate::{engine::EngineEvent, Board, Game};
+use crate::{engine::EngineEvent, Game};
 use bevy::prelude::*;
-use shakmaty::{Chess, FromSetup, Position};
 
-use super::History;
+use super::{History, HistoryEntry, SetupFromEntry};
 
-pub(crate) fn back(
+pub(crate) fn back<T: Component + Back, G: Component + SetupFromEntry>(
     keys: Res<ButtonInput<KeyCode>>,
     mut q_games: Query<&mut Game>,
-    mut q_history: Query<&mut History>,
+    mut q_back: Query<&mut T>,
     mut ev_engine: EventWriter<EngineEvent>,
 ) {
-    let mut game = q_games.get_single_mut().expect("Game not found!");
-    let mut history = q_history.get_single_mut().expect("History not found!");
+    let mut game = q_games.single_mut();
+    let mut history = q_back.single_mut();
+
     if !keys.pressed(KeyCode::ControlLeft)
         && keys.any_just_released([KeyCode::ArrowLeft, KeyCode::Backspace])
-        && history.current > 0
     {
-        history.current -= 1;
+        if let Some(previous) = history.back() {
+            game.setup_history_entry(previous);
+            ev_engine.send(EngineEvent);
+        }
+    }
+}
 
-        let previous = history.entries[history.current].clone();
+pub(crate) trait Back {
+    fn back(&mut self) -> Option<HistoryEntry>;
+}
 
-        let pos = Chess::from_setup(
-            shakmaty::Setup {
-                board: shakmaty::Board::from_bitboards(
-                    previous.board.by_role,
-                    previous.board.by_color,
-                ),
-                turn: previous.turn,
-                castling_rights: previous.castling_rights,
-                ..default()
-            },
-            shakmaty::CastlingMode::Standard,
-        )
-        .expect("Chess could not load!");
-
-        let board = pos.board().clone();
-        let (by_role, by_color) = board.into_bitboards();
-        let castles = pos.castles();
-
-        game.board = Board { by_role, by_color };
-        game.castling_rights = castles.castling_rights();
-        game.turn = pos.turn();
-
-        ev_engine.send(EngineEvent);
+impl Back for History {
+    fn back(&mut self) -> Option<HistoryEntry> {
+        if self.current > 0 {
+            self.current -= 1;
+            return Some(self.entries[self.current].clone());
+        }
+        None
     }
 }
