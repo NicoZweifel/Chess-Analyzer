@@ -111,7 +111,7 @@ pub(crate) fn check_engines(
 
                 if let Ok(m) = m {
                     let to_square = square_entities.get(&m.to()).unwrap();
-                    let from_square = square_entities.get(&m.from().unwrap()).unwrap();
+                    // let from_square = square_entities.get(&m.from().unwrap()).unwrap();
 
                     let texture: Handle<Image> = asset_server.load("Engine_Move.png");
 

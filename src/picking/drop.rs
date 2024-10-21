@@ -1,6 +1,7 @@
-use crate::{engine::EngineEvent, Piece, Play, PushEntryFromPos, Square};
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
+
+use crate::{analysis::EngineEvent, history::PushEntryFromPos, Piece, Play, Square};
 
 #[derive(Event)]
 pub(crate) struct DropEvent {

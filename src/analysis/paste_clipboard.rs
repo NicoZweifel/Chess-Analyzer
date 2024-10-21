@@ -1,4 +1,4 @@
-use crate::{fen::FenEvent, pgn::PgnEvent};
+use super::{fen::FenEvent, pgn::PgnEvent};
 use bevy::prelude::*;
 use copypasta::{ClipboardContext, ClipboardProvider};
 

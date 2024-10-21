@@ -10,6 +10,7 @@ mod last;
 mod next;
 mod push_entry_from_pos;
 mod setup_from_entry;
+mod startup;
 
 pub(crate) use back::*;
 pub(crate) use first::*;
@@ -17,6 +18,7 @@ pub(crate) use last::*;
 pub(crate) use next::*;
 pub(crate) use push_entry_from_pos::*;
 pub(crate) use setup_from_entry::*;
+use startup::startup;
 
 #[derive(Clone, Debug)]
 pub(crate) struct HistoryEntry {
@@ -62,7 +64,7 @@ impl<T: Component + last::Last, G: Component + SetupFromEntry> HistoryPlugin<T, 
 
 impl<T: Component + last::Last, G: Component + SetupFromEntry> Plugin for HistoryPlugin<T, G> {
     fn build(&self, app: &mut App) {
-        app.add_systems(
+        app.add_systems(Startup, startup).add_systems(
             Update,
             (
                 back::<History, Game>,

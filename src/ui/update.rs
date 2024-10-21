@@ -1,5 +1,5 @@
-use crate::{utils::get_texture, CaptureSound, Game, Piece, PlacementSound, Square};
-use bevy::{audio::Volume, prelude::*};
+use crate::{audio::SoundEvent, utils::get_texture, Game, Piece, Square};
+use bevy::prelude::*;
 use shakmaty::{Chess, FromSetup, Position};
 
 pub(crate) fn update(
@@ -8,6 +8,7 @@ pub(crate) fn update(
     q_squares: Query<(Entity, &Square, Option<&Children>)>,
     q_pieces: Query<(Entity, &Piece, &Parent)>,
     asset_server: Res<AssetServer>,
+    mut evr_sounds: EventWriter<SoundEvent>,
 ) {
     let game = q_games.single();
     let chess = Chess::from_setup(
@@ -54,17 +55,9 @@ pub(crate) fn update(
 
                     commands.entity(square.0).push_children(&[child]);
 
-                    commands.spawn((
-                        AudioBundle {
-                            source: asset_server.load("piece-capture.mp3"),
-                            settings: PlaybackSettings {
-                                volume: Volume::new(0.5),
-                                mode: bevy::audio::PlaybackMode::Despawn,
-                                ..default()
-                            },
-                        },
-                        CaptureSound,
-                    ));
+                    evr_sounds.send(SoundEvent {
+                        sound: "piece-capture.mp3".to_string(),
+                    });
                 }
             } else {
                 let child = commands
@@ -79,17 +72,9 @@ pub(crate) fn update(
 
                 commands.entity(square.0).push_children(&[child]);
 
-                commands.spawn((
-                    AudioBundle {
-                        source: asset_server.load("piece-placement.mp3"),
-                        settings: PlaybackSettings {
-                            volume: Volume::new(0.5),
-                            mode: bevy::audio::PlaybackMode::Despawn,
-                            ..default()
-                        },
-                    },
-                    PlacementSound,
-                ));
+                evr_sounds.send(SoundEvent {
+                    sound: "piece-placement.mp3".to_string(),
+                });
             }
         } else if let Some(piece_component) = piece_component {
             commands

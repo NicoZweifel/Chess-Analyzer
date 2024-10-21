@@ -1,7 +1,8 @@
-use crate::{fen::FenEvent, pgn::PgnEvent};
 use bevy::prelude::*;
 use std::fs::File;
 use std::io::prelude::*;
+
+use super::{fen::FenEvent, pgn::PgnEvent};
 
 pub(crate) fn file_drop(
     mut evr_dnd: EventReader<FileDragAndDrop>,

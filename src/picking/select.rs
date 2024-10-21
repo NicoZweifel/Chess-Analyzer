@@ -1,4 +1,4 @@
-use crate::{engine::EngineEvent, Game, Square};
+use crate::{analysis::EngineEvent, Game, Square};
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use shakmaty::{Chess, FromSetup, Position};

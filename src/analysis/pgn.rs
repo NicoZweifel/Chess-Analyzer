@@ -1,11 +1,13 @@
 use crate::{
-    engine::EngineEvent,
+    audio::SoundEvent,
     history::{History, HistoryEntry},
-    Board, BoardStartSound, Game,
+    Board, Game,
 };
-use bevy::{audio::Volume, prelude::*};
+use bevy::prelude::*;
 use pgn_reader::{BufferedReader, RawHeader, SanPlus, Skip, Visitor};
 use shakmaty::{fen::Fen, CastlingMode, Chess, Position};
+
+use super::EngineEvent;
 
 #[derive(Clone, Debug)]
 pub(crate) struct Positions {
@@ -78,12 +80,11 @@ impl PgnEvent {
 }
 
 pub(crate) fn pgn<T: Component + SetupFromPositions>(
-    mut commands: Commands,
     mut q_games: Query<&mut Game>,
     mut q_history: Query<&mut T>,
     mut evw_engine: EventWriter<EngineEvent>,
     mut evr_pgn: EventReader<PgnEvent>,
-    asset_server: Res<AssetServer>,
+    mut evr_sounds: EventWriter<SoundEvent>,
 ) {
     for ev in evr_pgn.read() {
         let content = ev.content.clone();
@@ -99,17 +100,9 @@ pub(crate) fn pgn<T: Component + SetupFromPositions>(
 
             history.setup_from_positions(visitor);
 
-            commands.spawn((
-                AudioBundle {
-                    source: asset_server.load("board-start.mp3"),
-                    settings: PlaybackSettings {
-                        volume: Volume::new(0.5),
-                        mode: bevy::audio::PlaybackMode::Despawn,
-                        ..default()
-                    },
-                },
-                BoardStartSound,
-            ));
+            evr_sounds.send(SoundEvent {
+                sound: "board-start.mp3".to_string(),
+            });
 
             evw_engine.send(EngineEvent);
         }

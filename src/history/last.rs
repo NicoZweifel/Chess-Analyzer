@@ -1,4 +1,4 @@
-use crate::engine::EngineEvent;
+use crate::analysis::EngineEvent;
 use bevy::prelude::*;
 
 use super::{History, HistoryEntry, SetupFromEntry};

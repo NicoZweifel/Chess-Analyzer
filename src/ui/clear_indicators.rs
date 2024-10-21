@@ -1,5 +1,9 @@
-use crate::{engine::EngineEvent, DropEvent, EngineIndicator, SelectEvent, SelectIndicator};
 use bevy::prelude::*;
+
+use crate::{
+    analysis::{EngineEvent, EngineIndicator},
+    picking::{DropEvent, SelectEvent, SelectIndicator},
+};
 
 pub(crate) fn clear_indicators(
     q_select_indicators: Query<(Entity, &SelectIndicator, &Parent)>,
