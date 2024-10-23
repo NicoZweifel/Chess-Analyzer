@@ -9,7 +9,7 @@ use bevy::{
 use bevy::utils::HashMap;
 use shakmaty::{fen::Fen, Chess, FromSetup};
 
-use crate::{Game, Square};
+use crate::{ui::SpawnEngineIndicator, Game, Square};
 
 #[derive(Component, Clone, Debug)]
 pub(crate) struct Engine(pub(crate) PathBuf);
@@ -26,10 +26,10 @@ pub(crate) struct EngineTasks(pub(crate) HashMap<String, Task<String>>);
 pub(crate) fn send_to_engines(
     mut rm_tasks: ResMut<EngineTasks>,
     q_engines: Query<&Engine>,
-    q_games: Query<&mut Game>,
+    q_games: Query<&Game>,
     mut ev_engine: EventReader<EngineEvent>,
 ) {
-    let game = q_games.get_single().expect("Game not found!").clone();
+    let game = q_games.single().clone();
 
     for _ in ev_engine.read() {
         for engine in q_engines.iter() {
@@ -103,7 +103,7 @@ pub(crate) fn check_engines(
                 let square_entities: HashMap<shakmaty::Square, Entity> = q_squares
                     .into_iter()
                     .map(|x| {
-                        let square = x.1.square;
+                        let square = x.1 .0;
                         let entity = x.0;
                         (square, entity)
                     })
@@ -112,21 +112,7 @@ pub(crate) fn check_engines(
                 if let Ok(m) = m {
                     let to_square = square_entities.get(&m.to()).unwrap();
                     // let from_square = square_entities.get(&m.from().unwrap()).unwrap();
-
-                    let texture: Handle<Image> = asset_server.load("Engine_Move.png");
-
-                    let child_to = commands
-                        .spawn((
-                            EngineIndicator,
-                            SpriteBundle {
-                                texture: texture.clone(),
-                                transform: Transform::from_xyz(0.0, 0.0, 0.3),
-                                ..default()
-                            },
-                        ))
-                        .id();
-
-                    commands.entity(*to_square).push_children(&[child_to]);
+                    commands.spawn_engine_indicator(to_square, &asset_server);
                 }
             }
         }

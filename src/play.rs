@@ -23,14 +23,11 @@ impl Play for Game {
         let moves = chess.legal_moves();
         let legal_move = moves
             .iter()
-            .find(|&x| x.from() == Some(from_square.square) && x.to() == to_square.square);
+            .find(|&x| x.from() == Some(from_square.0) && x.to() == to_square.0);
 
         if let Some(m) = legal_move {
             match chess.play(m) {
-                Ok(c) => {
-                    self.setup_pos(c.clone());
-                    return Ok(c);
-                }
+                Ok(c) => return Ok(self.setup_pos(c)),
                 Err(_) => return Err(()),
             }
         }

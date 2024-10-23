@@ -22,6 +22,7 @@ pub(crate) fn update(
         shakmaty::CastlingMode::Standard,
     )
     .expect("Chess could not load!");
+
     for (sq_entity, sq, sq_children) in q_squares.iter() {
         let mut piece_component: Option<(Entity, &Piece)> = None;
 
@@ -34,7 +35,7 @@ pub(crate) fn update(
             }
         }
 
-        let piece = chess.board().piece_at(sq.square);
+        let piece = chess.board().piece_at(sq.0);
         let res = get_piece_texture(piece, &asset_server);
 
         if let Some((texture, piece)) = res {

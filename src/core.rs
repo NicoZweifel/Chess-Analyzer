@@ -2,12 +2,10 @@ use bevy::prelude::*;
 use shakmaty::{Bitboard, ByColor, ByRole, CastlingMode, Chess, FromSetup, Position};
 
 #[derive(Component, Clone, Copy, Debug)]
-pub struct Piece(pub shakmaty::Piece);
+pub struct Piece(pub(crate) shakmaty::Piece);
 
 #[derive(Component, Clone, Debug, Copy)]
-pub struct Square {
-    pub square: shakmaty::Square,
-}
+pub struct Square(pub shakmaty::Square);
 
 #[derive(Component, Clone, Debug)]
 pub struct Game {
@@ -23,12 +21,6 @@ pub struct Board {
     pub by_color: ByColor<Bitboard>,
 }
 
-impl Square {
-    pub fn new(square: shakmaty::Square) -> Self {
-        Self { square }
-    }
-}
-
 impl Game {
     pub fn default() -> Self {
         let start = Chess::default();
@@ -42,13 +34,13 @@ impl Game {
         }
     }
 
-    pub fn setup(&mut self, setup: shakmaty::Setup) {
+    pub fn setup(&mut self, setup: shakmaty::Setup) -> Chess {
         self.setup_pos(
             Chess::from_setup(setup, CastlingMode::Standard).expect("Chess could not load!"),
-        );
+        )
     }
 
-    pub fn setup_pos(&mut self, pos: Chess) {
+    pub fn setup_pos(&mut self, pos: Chess) -> Chess {
         let board = pos.board().clone();
         let (by_role, by_color) = board.into_bitboards();
         let castles = pos.castles();
@@ -57,5 +49,6 @@ impl Game {
         self.castling_rights = castles.castling_rights();
         self.turn = pos.turn();
         self.ep_square = pos.ep_square(shakmaty::EnPassantMode::Legal);
+        pos
     }
 }

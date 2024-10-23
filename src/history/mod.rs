@@ -1,6 +1,4 @@
-use std::marker::PhantomData;
-
-use crate::{Board, Game};
+use crate::Board;
 use bevy::prelude::*;
 use shakmaty::Bitboard;
 
@@ -18,6 +16,7 @@ pub(crate) use last::*;
 pub(crate) use next::*;
 pub(crate) use push_entry_from_pos::*;
 pub(crate) use setup_from_entry::*;
+
 use startup::startup;
 
 #[derive(Clone, Debug)]

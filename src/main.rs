@@ -42,7 +42,7 @@ fn main() {
                     primary_window: Some(Window {
                         title: String::from("Chess"),
                         present_mode: bevy_window::PresentMode::AutoVsync,
-                        resolution: (1000., 800.).into(),
+                        resolution: (800., 800.).into(),
                         ..Default::default()
                     }),
                     ..default()

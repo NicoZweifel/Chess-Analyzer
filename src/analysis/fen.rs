@@ -27,11 +27,11 @@ pub(crate) fn fen(
             let mut game = q_games.get_single_mut().expect("Game not found!");
             let mut history = q_history.get_single_mut().expect("History not found!");
 
-            let pos = fen.into_setup();
+            let setup = fen.into_setup();
 
-            game.setup(pos.clone());
+            game.setup(setup.clone());
 
-            history.setup(pos);
+            history.setup(setup);
 
             evr_sounds.send(SoundEvent {
                 sound: "board-start.mp3".to_string(),

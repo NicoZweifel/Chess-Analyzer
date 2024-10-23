@@ -1,4 +1,4 @@
-use crate::{analysis::EngineEvent, Game, Square};
+use crate::{analysis::EngineEvent, ui::SpawnSelectIndicator, Game, Square};
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use shakmaty::{Chess, FromSetup, Position};
@@ -55,7 +55,7 @@ pub(crate) fn select(
         let square_entities: HashMap<shakmaty::Square, Entity> = q_squares
             .into_iter()
             .map(|x| {
-                let square = x.1.square;
+                let square = x.1 .0;
                 let entity = x.0;
                 (square, entity)
             })
@@ -64,22 +64,9 @@ pub(crate) fn select(
         if let Ok((_, square)) = square {
             let moves = chess.legal_moves();
 
-            for m in moves.iter().filter(|&x| x.from() == Some(square.square)) {
+            for m in moves.iter().filter(|&x| x.from() == Some(square.0)) {
                 let square = square_entities.get(&m.to()).unwrap();
-                let texture: Handle<Image> = asset_server.load("Name=Off, Hint=On.png");
-
-                let child = commands
-                    .spawn((
-                        SelectIndicator,
-                        SpriteBundle {
-                            texture,
-                            transform: Transform::from_xyz(0.0, 0.0, 0.3),
-                            ..default()
-                        },
-                    ))
-                    .id();
-
-                commands.entity(*square).push_children(&[child]);
+                commands.spawn_select_indicator(square, &asset_server);
             }
         }
     }

@@ -1,6 +1,6 @@
 use bevy::{
     prelude::*,
-    sprite::{MaterialMesh2dBundle, Mesh2dHandle},
+    sprite::{Material2d, MaterialMesh2dBundle, Mesh2dHandle},
 };
 use bevy_mod_picking::prelude::*;
 use shakmaty::{Chess, Position};
@@ -10,6 +10,55 @@ use crate::{
     picking::{DragEndEvent, DragEvent, DropEvent, SelectEvent},
     Piece, Square,
 };
+
+#[derive(Bundle)]
+struct Button {
+    drop: On<Pointer<Drop>>,
+    drag: On<Pointer<Drag>>,
+    down: On<Pointer<Down>>,
+    drag_end: On<Pointer<DragEnd>>,
+}
+
+impl Default for Button {
+    fn default() -> Self {
+        Self {
+            drop: On::<Pointer<Drop>>::send_event::<DropEvent>(),
+            down: On::<Pointer<Down>>::send_event::<SelectEvent>(),
+            drag: On::<Pointer<Drag>>::send_event::<DragEvent>(),
+            drag_end: On::<Pointer<DragEnd>>::send_event::<DragEndEvent>(),
+        }
+    }
+}
+
+#[derive(Bundle)]
+struct SquareButton<M: Material2d> {
+    material_mesh_2d: MaterialMesh2dBundle<M>,
+    square: Square,
+    button: Button,
+}
+
+impl<M: Material2d> Default for SquareButton<M> {
+    fn default() -> Self {
+        Self {
+            button: default(),
+            material_mesh_2d: default(),
+            square: Square(shakmaty::Square::A1),
+        }
+    }
+}
+
+#[derive(Bundle)]
+struct SquareBundle<M: Material2d> {
+    material_mesh_2d: MaterialMesh2dBundle<M>,
+}
+
+impl<M: Material2d> Default for SquareBundle<M> {
+    fn default() -> Self {
+        Self {
+            material_mesh_2d: default(),
+        }
+    }
+}
 
 pub(crate) fn startup(
     mut commands: Commands,
@@ -29,23 +78,25 @@ pub(crate) fn startup(
         let j = (counter as f32 / 8.0).floor() as i32;
         let i = (counter % 8) as i32;
 
-        commands.spawn((MaterialMesh2dBundle {
-            mesh: mesh.clone(),
-            // Change material according to position to get alternating pattern
-            material: if (i + j + 1) % 2 == 0 {
-                white.clone()
-            } else {
-                black.clone()
-            },
-            transform: Transform::from_xyz((i * 100 - 350) as f32, (j * 100 - 350) as f32, 0.1),
-            ..Default::default()
-        },));
-
         let texture = get_piece_texture(start.board().piece_at(*square), &asset_server);
 
+        commands.spawn(SquareBundle {
+            material_mesh_2d: MaterialMesh2dBundle {
+                mesh: mesh.clone(),
+                // Change material according to position to get alternating pattern
+                material: if (i + j + 1) % 2 == 0 {
+                    white.clone()
+                } else {
+                    black.clone()
+                },
+                transform: Transform::from_xyz((i * 100 - 350) as f32, (j * 100 - 350) as f32, 0.1),
+                ..default()
+            },
+        });
+
         commands
-            .spawn((
-                MaterialMesh2dBundle {
+            .spawn(SquareButton {
+                material_mesh_2d: MaterialMesh2dBundle {
                     mesh: mesh.clone(),
                     material: materials.add(Color::hsla(0.0, 0.0, 0.0, 0.0)),
                     transform: Transform::from_xyz(
@@ -53,14 +104,11 @@ pub(crate) fn startup(
                         (j * 100 - 350) as f32,
                         0.2,
                     ),
-                    ..Default::default()
+                    ..default()
                 },
-                Square::new(*square),
-                On::<Pointer<Drop>>::send_event::<DropEvent>(),
-                On::<Pointer<Down>>::send_event::<SelectEvent>(),
-                On::<Pointer<Drag>>::send_event::<DragEvent>(),
-                On::<Pointer<DragEnd>>::send_event::<DragEndEvent>(),
-            ))
+                square: Square(*square),
+                ..default()
+            })
             .with_children(|parent| {
                 if let Some((texture, piece)) = texture {
                     parent.spawn((
