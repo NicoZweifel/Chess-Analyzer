@@ -5,9 +5,9 @@ use bevy::{
 use bevy_mod_picking::prelude::*;
 use shakmaty::{Chess, Position};
 
+use super::get_piece_texture;
 use crate::{
     picking::{DragEndEvent, DragEvent, DropEvent, SelectEvent},
-    utils::get_texture,
     Piece, Square,
 };
 
@@ -41,7 +41,7 @@ pub(crate) fn startup(
             ..Default::default()
         },));
 
-        let texture = get_texture(start.board().piece_at(*square), &asset_server);
+        let texture = get_piece_texture(start.board().piece_at(*square), &asset_server);
 
         commands
             .spawn((
