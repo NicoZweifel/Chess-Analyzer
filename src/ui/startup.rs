@@ -12,14 +12,14 @@ use crate::{
 };
 
 #[derive(Bundle)]
-struct Button {
+struct Pickable {
     drop: On<Pointer<Drop>>,
     drag: On<Pointer<Drag>>,
     down: On<Pointer<Down>>,
     drag_end: On<Pointer<DragEnd>>,
 }
 
-impl Default for Button {
+impl Default for Pickable {
     fn default() -> Self {
         Self {
             drop: On::<Pointer<Drop>>::send_event::<DropEvent>(),
@@ -34,13 +34,13 @@ impl Default for Button {
 struct SquareButton<M: Material2d> {
     material_mesh_2d: MaterialMesh2dBundle<M>,
     square: Square,
-    button: Button,
+    pickable: Pickable,
 }
 
 impl<M: Material2d> Default for SquareButton<M> {
     fn default() -> Self {
         Self {
-            button: default(),
+            pickable: default(),
             material_mesh_2d: default(),
             square: Square(shakmaty::Square::A1),
         }
