@@ -1,4 +1,5 @@
-use crate::{audio::SoundEvent, utils::get_texture, Game, Piece, Square};
+use super::get_piece_texture;
+use crate::{audio::SoundEvent, Game, Piece, Square};
 use bevy::prelude::*;
 use shakmaty::{Chess, FromSetup, Position};
 
@@ -21,10 +22,10 @@ pub(crate) fn update(
         shakmaty::CastlingMode::Standard,
     )
     .expect("Chess could not load!");
-    for square in q_squares.iter() {
+    for (sq_entity, sq, sq_children) in q_squares.iter() {
         let mut piece_component: Option<(Entity, &Piece)> = None;
 
-        if let Some(children) = square.2 {
+        if let Some(children) = sq_children {
             for &child in children.iter() {
                 if let Ok(piece) = q_pieces.get(child) {
                     piece_component = Some((child, piece.1));
@@ -33,15 +34,14 @@ pub(crate) fn update(
             }
         }
 
-        let piece = chess.board().piece_at(square.1.square);
-        let res = get_texture(piece, &asset_server);
+        let piece = chess.board().piece_at(sq.square);
+        let res = get_piece_texture(piece, &asset_server);
+
         if let Some((texture, piece)) = res {
-            if let Some(piece_component) = piece_component {
-                if piece_component.1 .0 != piece {
-                    commands
-                        .entity(square.0)
-                        .remove_children(&[piece_component.0]);
-                    commands.entity(piece_component.0).despawn();
+            if let Some((p_entity, p_component)) = piece_component {
+                if p_component.0 != piece {
+                    commands.entity(sq_entity).remove_children(&[p_entity]);
+                    commands.entity(p_entity).despawn();
 
                     let child = commands
                         .spawn((
@@ -53,7 +53,7 @@ pub(crate) fn update(
                         ))
                         .id();
 
-                    commands.entity(square.0).push_children(&[child]);
+                    commands.entity(sq_entity).push_children(&[child]);
 
                     evr_sounds.send(SoundEvent {
                         sound: "piece-capture.mp3".to_string(),
@@ -70,17 +70,15 @@ pub(crate) fn update(
                     ))
                     .id();
 
-                commands.entity(square.0).push_children(&[child]);
+                commands.entity(sq_entity).push_children(&[child]);
 
                 evr_sounds.send(SoundEvent {
                     sound: "piece-placement.mp3".to_string(),
                 });
             }
-        } else if let Some(piece_component) = piece_component {
-            commands
-                .entity(square.0)
-                .remove_children(&[piece_component.0]);
-            commands.entity(piece_component.0).despawn();
+        } else if let Some((p_entity, _)) = piece_component {
+            commands.entity(sq_entity).remove_children(&[p_entity]);
+            commands.entity(p_entity).despawn();
         }
     }
 }

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-pub(crate) fn get_texture(
+pub(crate) fn get_piece_texture(
     piece: Option<shakmaty::Piece>,
     asset_server: &Res<AssetServer>,
 ) -> Option<(Handle<Image>, shakmaty::Piece)> {

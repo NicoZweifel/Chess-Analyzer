@@ -3,10 +3,10 @@ use bevy::prelude::*;
 
 use super::{History, HistoryEntry, SetupFromEntry};
 
-pub(crate) fn back<T: Component + Back, G: Component + SetupFromEntry>(
+pub(crate) fn back(
     keys: Res<ButtonInput<KeyCode>>,
     mut q_games: Query<&mut Game>,
-    mut q_back: Query<&mut T>,
+    mut q_back: Query<&mut History>,
     mut ev_engine: EventWriter<EngineEvent>,
 ) {
     let mut game = q_games.single_mut();

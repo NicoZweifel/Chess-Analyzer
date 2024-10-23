@@ -1,10 +1,12 @@
 use bevy::prelude::*;
 
 mod clear_indicators;
+mod get_piece_texture;
 mod startup;
 mod update;
 
 pub(crate) use clear_indicators::*;
+pub(crate) use get_piece_texture::*;
 pub(crate) use startup::*;
 pub(crate) use update::*;
 

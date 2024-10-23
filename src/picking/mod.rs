@@ -13,8 +13,6 @@ pub(crate) use drag_end::*;
 pub(crate) use drop::*;
 pub(crate) use select::*;
 
-use crate::{history::History, Game};
-
 pub struct PickingPlugin;
 
 impl Plugin for PickingPlugin {
@@ -25,12 +23,7 @@ impl Plugin for PickingPlugin {
             .add_event::<DragEndEvent>()
             .add_systems(
                 Update,
-                (
-                    drop::<Game, History>.before(drag_end),
-                    select,
-                    drag,
-                    drag_end.after(drop::<Game, History>),
-                ),
+                (drop.before(drag_end), select, drag, drag_end.after(drop)),
             );
     }
 }

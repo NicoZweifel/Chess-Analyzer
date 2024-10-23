@@ -25,8 +25,7 @@ pub(crate) fn drag(
 ) {
     for event in ev_drag_end.read() {
         let square = q_squares.get_mut(event.listener);
-        if let Ok(square) = square {
-            let mut transform = square.1;
+        if let Ok((_, mut transform)) = square {
             transform.translation.y -= event.delta.y;
             transform.translation.x += event.delta.x;
             transform.translation.z = 0.4;

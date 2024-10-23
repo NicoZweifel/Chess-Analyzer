@@ -2,7 +2,7 @@ use std::fs;
 
 use bevy::{prelude::*, utils::HashMap};
 
-use super::{Engine, EngineTasks};
+use super::{Engine, EngineEvaluation, EngineTasks};
 
 pub(crate) fn startup(mut commands: Commands) {
     let entries = fs::read_dir("./engines").unwrap();
@@ -14,4 +14,6 @@ pub(crate) fn startup(mut commands: Commands) {
     }
 
     commands.insert_resource(EngineTasks(HashMap::new()));
+
+    commands.spawn(EngineEvaluation(0., 0.));
 }

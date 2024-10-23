@@ -1,12 +1,12 @@
-use crate::analysis::EngineEvent;
+use crate::{analysis::EngineEvent, Game};
 use bevy::prelude::*;
 
 use super::{History, HistoryEntry, SetupFromEntry};
 
-pub(crate) fn next<T: Component + Next, G: Component + SetupFromEntry>(
+pub(crate) fn next(
     keys: Res<ButtonInput<KeyCode>>,
-    mut q_games: Query<&mut G>,
-    mut q_next: Query<&mut T>,
+    mut q_games: Query<&mut Game>,
+    mut q_next: Query<&mut History>,
     mut ev_engine: EventWriter<EngineEvent>,
 ) {
     let mut game = q_games.single_mut();

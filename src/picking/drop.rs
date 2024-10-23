@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 
-use crate::{analysis::EngineEvent, history::PushEntryFromPos, Piece, Play, Square};
+use crate::{analysis::EngineEvent, history::PushEntryFromPos, Game, History, Piece, Play, Square};
 
 #[derive(Event)]
 pub(crate) struct DropEvent {
@@ -21,10 +21,10 @@ impl From<ListenerInput<Pointer<Drop>>> for DropEvent {
     }
 }
 
-pub(crate) fn drop<T: Component + Play, G: Component + PushEntryFromPos>(
+pub(crate) fn drop(
     mut ev_drop: EventReader<DropEvent>,
-    mut q_games: Query<&mut T>,
-    mut q_history: Query<&mut G>,
+    mut q_games: Query<&mut Game>,
+    mut q_history: Query<&mut History>,
     mut ev_engine: EventWriter<EngineEvent>,
     q_squares: Query<&Square>,
     q_pieces: Query<(&Piece, &Parent)>,

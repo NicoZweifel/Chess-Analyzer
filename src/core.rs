@@ -2,25 +2,25 @@ use bevy::prelude::*;
 use shakmaty::{Bitboard, ByColor, ByRole, CastlingMode, Chess, FromSetup, Position};
 
 #[derive(Component, Clone, Copy, Debug)]
-pub(crate) struct Piece(pub(crate) shakmaty::Piece);
+pub struct Piece(pub shakmaty::Piece);
 
 #[derive(Component, Clone, Debug, Copy)]
-pub(crate) struct Square {
-    pub(crate) square: shakmaty::Square,
+pub struct Square {
+    pub square: shakmaty::Square,
 }
 
 #[derive(Component, Clone, Debug)]
-pub(crate) struct Game {
-    pub(crate) board: Board,
-    pub(crate) turn: shakmaty::Color,
-    pub(crate) castling_rights: Bitboard,
-    pub(crate) ep_square: Option<shakmaty::Square>,
+pub struct Game {
+    pub board: Board,
+    pub turn: shakmaty::Color,
+    pub castling_rights: Bitboard,
+    pub ep_square: Option<shakmaty::Square>,
 }
 
 #[derive(Clone, Copy, Debug)]
-pub(crate) struct Board {
-    pub(crate) by_role: ByRole<Bitboard>,
-    pub(crate) by_color: ByColor<Bitboard>,
+pub struct Board {
+    pub by_role: ByRole<Bitboard>,
+    pub by_color: ByColor<Bitboard>,
 }
 
 impl Square {

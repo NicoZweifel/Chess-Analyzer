@@ -50,28 +50,11 @@ impl History {
     }
 }
 
-pub struct HistoryPlugin<T: Component + last::Last, G: Component + SetupFromEntry> {
-    phantom: PhantomData<(T, G)>,
-}
+pub struct HistoryPlugin;
 
-impl<T: Component + last::Last, G: Component + SetupFromEntry> HistoryPlugin<T, G> {
-    pub fn default() -> Self {
-        Self {
-            phantom: PhantomData,
-        }
-    }
-}
-
-impl<T: Component + last::Last, G: Component + SetupFromEntry> Plugin for HistoryPlugin<T, G> {
+impl Plugin for HistoryPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, startup).add_systems(
-            Update,
-            (
-                back::<History, Game>,
-                next::<History, Game>,
-                first::<History, Game>,
-                last::<History, Game>,
-            ),
-        );
+        app.add_systems(Startup, startup)
+            .add_systems(Update, (back, next, first, last));
     }
 }
