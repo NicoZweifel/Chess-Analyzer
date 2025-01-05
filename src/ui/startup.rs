@@ -31,13 +31,13 @@ impl Default for Pickable {
 }
 
 #[derive(Bundle)]
-struct SquareButton<M: Material2d> {
+struct SquarePickingBundle<M: Material2d> {
     material_mesh_2d: MaterialMesh2dBundle<M>,
     square: Square,
     pickable: Pickable,
 }
 
-impl<M: Material2d> Default for SquareButton<M> {
+impl<M: Material2d> Default for SquarePickingBundle<M> {
     fn default() -> Self {
         Self {
             pickable: default(),
@@ -56,6 +56,24 @@ impl<M: Material2d> Default for SquareBundle<M> {
     fn default() -> Self {
         Self {
             material_mesh_2d: default(),
+        }
+    }
+}
+
+#[derive(Bundle)]
+struct PieceBundle {
+    piece: Piece,
+    sprite: SpriteBundle,
+}
+
+impl Default for PieceBundle {
+    fn default() -> Self {
+        Self {
+            piece: Piece(shakmaty::Piece {
+                color: shakmaty::Color::White,
+                role: shakmaty::Role::King,
+            }),
+            sprite: default(),
         }
     }
 }
@@ -95,7 +113,7 @@ pub(crate) fn startup(
         });
 
         commands
-            .spawn(SquareButton {
+            .spawn(SquarePickingBundle {
                 material_mesh_2d: MaterialMesh2dBundle {
                     mesh: mesh.clone(),
                     material: materials.add(Color::hsla(0.0, 0.0, 0.0, 0.0)),
@@ -111,13 +129,13 @@ pub(crate) fn startup(
             })
             .with_children(|parent| {
                 if let Some((texture, piece)) = texture {
-                    parent.spawn((
-                        Piece(piece),
-                        SpriteBundle {
+                    parent.spawn(PieceBundle {
+                        piece: Piece(piece),
+                        sprite: SpriteBundle {
                             texture,
                             ..default()
                         },
-                    ));
+                    });
                 }
             });
     }

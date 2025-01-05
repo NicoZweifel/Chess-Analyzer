@@ -8,15 +8,11 @@ struct SelectIndicatorBundle {
     sprite: SpriteBundle,
 }
 
-impl SelectIndicatorBundle {
-    fn new(texture: Handle<Image>) -> Self {
+impl Default for SelectIndicatorBundle {
+    fn default() -> Self {
         Self {
             indicator: SelectIndicator,
-            sprite: SpriteBundle {
-                texture,
-                transform: Transform::from_xyz(0.0, 0.0, 0.3),
-                ..default()
-            },
+            sprite: SpriteBundle { ..default() },
         }
     }
 }
@@ -29,7 +25,16 @@ impl SpawnSelectIndicator for Commands<'_, '_> {
     fn spawn_select_indicator(&mut self, square: &Entity, asset_server: &Res<AssetServer>) {
         let texture: Handle<Image> = asset_server.load("Name=Off, Hint=On.png");
 
-        let child = self.spawn(SelectIndicatorBundle::new(texture)).id();
+        let child = self
+            .spawn(SelectIndicatorBundle {
+                sprite: SpriteBundle {
+                    texture,
+                    transform: Transform::from_xyz(0.0, 0.0, 0.3),
+                    ..default()
+                },
+                ..default()
+            })
+            .id();
 
         self.entity(*square).push_children(&[child]);
     }
